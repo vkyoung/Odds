@@ -14,37 +14,23 @@
 
 @implementation mapViewController
 
+#pragma mark - View
 
-/*
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:37.7868295 longitude:-122.4091308 zoom:16 bearing:0 viewingAngle:0];
-    self.mapView = [GMSMapView mapWithFrame:self.view.bounds camera:camera];
-    
-    self.mapView.mapType                   = kGMSTypeNormal;
-    self.mapView.myLocationEnabled         = YES;
-    self.mapView.settings.compassButton    = YES;
-    self.mapView.settings.myLocationButton = YES;
-    [self.mapView setMinZoom:10 maxZoom:20];
+
+    //allocate and initialize location manager
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    [self.locationManager startUpdatingLocation];
     
     
     //hide navigation bar
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
-    
-    
-    [self.view addSubview:self.mapView];
 }
 
 
@@ -75,6 +61,60 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+#pragma mark - helper
+
+- (void) setMapWithLocation:(CLLocation *)location
+{
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude: location.coordinate.latitude  longitude:location.coordinate.longitude zoom:16 bearing:0 viewingAngle:0];
+    self.mapView = [GMSMapView mapWithFrame:self.view.bounds camera:camera];
+    self.mapView.mapType                   = kGMSTypeNormal;
+    self.mapView.myLocationEnabled         = YES;
+    self.mapView.settings.compassButton    = YES;
+    self.mapView.settings.myLocationButton = YES;
+    [self.mapView setMinZoom:10 maxZoom:20];
+    
+}
+
+
+
+#pragma mark - CLLocationManager
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Location Update Error!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    
+    [alertView show];
+}
+
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    CLLocation *currentLocation = [locations lastObject];
+
+    if(currentLocation != nil) {
+        //give current location to the map and show it
+        [self setMapWithLocation:currentLocation];
+        [self.view addSubview:self.mapView];
+        
+        //stop update location
+        [self.locationManager stopUpdatingLocation];
+        
+    }
+    
+    
+    
+/*
+    if (currentLocation != nil) {
+        NSString *longitude = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.longitude];
+        NSString *latitude  = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.latitude];
+        NSLog(@"%@, %@", longitude, latitude);
+    }
+*/
+    
+    
+}
+
 
 /*
 #pragma mark - Navigation

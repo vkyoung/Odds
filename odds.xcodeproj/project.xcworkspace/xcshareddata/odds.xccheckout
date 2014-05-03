@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>D0890A75-3EA5-409C-8265-B471C57FCC99</string>
+	<key>IDESourceControlProjectName</key>
+	<string>odds</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>ABBF409F-9930-4D95-B6DC-995B255C972D</key>
+		<string>https://github.com/vkyoung/Odds.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>odds.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>ABBF409F-9930-4D95-B6DC-995B255C972D</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/vkyoung/Odds.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>ABBF409F-9930-4D95-B6DC-995B255C972D</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>ABBF409F-9930-4D95-B6DC-995B255C972D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>odds_v5_</string>
+		</dict>
+	</array>
+</dict>
+</plist>
