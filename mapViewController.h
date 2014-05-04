@@ -15,6 +15,7 @@
 @property (nonatomic, strong) CLLocationManager *locationManager;
 
 
+@property (strong, nonatomic) IBOutlet UITextField *searchBarTextField;
 
 - (void) setMapWithLocation : (CLLocation *)location;
 

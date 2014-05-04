@@ -71,7 +71,7 @@
             </objects>
             <point key="canvasLocation" x="832" y="-172"/>
         </scene>
-        <!--Map View Controller - Map-->
+        <!--Map View Controller-->
         <scene sceneID="Bfv-gE-fJN">
             <objects>
                 <viewController id="SVj-Jk-aJd" customClass="mapViewController" sceneMemberID="viewController">
@@ -84,7 +84,18 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Map" id="5zK-3a-SlP"/>
+                    <navigationItem key="navigationItem" id="5zK-3a-SlP">
+                        <nil key="title"/>
+                        <textField key="titleView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Search" minimumFontSize="17" clearButtonMode="always" id="vcK-en-5iZ">
+                            <rect key="frame" x="8" y="7" width="304" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </textField>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="searchBarTextField" destination="vcK-en-5iZ" id="uFa-Vb-F90"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UYd-NP-HsE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

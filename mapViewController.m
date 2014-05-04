@@ -29,7 +29,7 @@
     
     
     //hide navigation bar
-    [self.navigationController setNavigationBarHidden:YES animated:YES];
+//    [self.navigationController setNavigationBarHidden:YES animated:YES];
     
 }
 
@@ -63,7 +63,7 @@
 }
 
 
-#pragma mark - helper
+#pragma mark - setting map
 
 - (void) setMapWithLocation:(CLLocation *)location
 {
