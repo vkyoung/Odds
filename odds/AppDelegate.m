@@ -21,7 +21,7 @@
     [self.window makeKeyAndVisible];
      */
     
-    [GMSServices provideAPIKey:@"AIzaSyBpKpaoCPSI9u2ULC759oy0ZG-oxXYzPi0"];
+    [GMSServices provideAPIKey:@"AIzaSyAA0o50b_qZP2zp1Hx_HLiTMXURmjQsjnw"];
     return YES;
 }
 
