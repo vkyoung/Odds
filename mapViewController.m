@@ -28,8 +28,17 @@
     [self.locationManager startUpdatingLocation];
     
     
+    //search table initilization
+    self.searchTableView.hidden = YES;
+    
+    //initial variables
+    self.retrivedItems = [[NSArray alloc] initWithObjects:@"one", @"two", @"three", @"four", @"five", @"six", @"seven", @"eight", @"nine", @"ten", @"eleven", @"twelve", @"thirteen", @"forteen", nil];
+    self.filteredItems = [[NSMutableArray alloc] initWithArray:self.retrivedItems];
+    
     //hide navigation bar
-//    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    
+    
     
 }
 
@@ -95,23 +104,13 @@
     if(currentLocation != nil) {
         //give current location to the map and show it
         [self setMapWithLocation:currentLocation];
-        [self.view addSubview:self.mapView];
+        //[self.view addSubview:self.mapView];
+        [self.view insertSubview:self.mapView atIndex:0];
         
         //stop update location
         [self.locationManager stopUpdatingLocation];
         
     }
-    
-    
-    
-/*
-    if (currentLocation != nil) {
-        NSString *longitude = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.longitude];
-        NSString *latitude  = [NSString stringWithFormat:@"%.8f", currentLocation.coordinate.latitude];
-        NSLog(@"%@, %@", longitude, latitude);
-    }
-*/
-    
     
 }
 
@@ -126,5 +125,52 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+
+#pragma mark - search bar and table view
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    if([searchText length] == 0) {
+        self.searchTableView.hidden = YES;
+        [self.filteredItems removeAllObjects];
+    } else {
+        self.searchTableView.hidden = NO;
+        [self.filteredItems removeAllObjects];
+        for(NSString *oneString in self.retrivedItems) {
+            NSRange r = [oneString rangeOfString:searchText options:NSCaseInsensitiveSearch];
+            if(r.location != NSNotFound) {
+                [self.filteredItems addObject:oneString];
+            }
+        }
+    }
+    
+    [self.searchTableView reloadData];
+}
+
+-(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+-(NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [self.filteredItems count];
+}
+
+-(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *cellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [self.searchTableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    }
+    
+    cell.textLabel.text = self.filteredItems[indexPath.row];
+    return cell;
+}
+
 
 @end

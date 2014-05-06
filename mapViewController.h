@@ -9,13 +9,21 @@
 #import <UIKit/UIKit.h>
 #import <GoogleMaps/GoogleMaps.h>
 
-@interface mapViewController : UIViewController <CLLocationManagerDelegate>
+@interface mapViewController : UIViewController <CLLocationManagerDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) GMSMapView *mapView;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 
+@property (strong, nonatomic) IBOutlet UITableView *searchTableView;
+@property (strong, nonatomic) IBOutlet UISearchBar *searchBarTextField;
 
-@property (strong, nonatomic) IBOutlet UITextField *searchBarTextField;
+
+
+//variables
+@property (nonatomic, strong) NSArray *retrivedItems;
+@property (nonatomic, strong) NSMutableArray *filteredItems;
+
+//methods
 
 - (void) setMapWithLocation : (CLLocation *)location;
 
