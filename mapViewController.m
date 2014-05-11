@@ -75,7 +75,9 @@
 
 - (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude withNewMapView: (bool) isNewView
 {
-    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:centerLatitude longitude:centerLongitude zoom:17 bearing:0 viewingAngle:60];
+    
+    //set map view
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:centerLatitude longitude:centerLongitude zoom:17 bearing:0 viewingAngle:70];
     
     if (isNewView == YES) {
         self.mapView = [GMSMapView mapWithFrame:self.view.bounds camera:camera];
@@ -90,7 +92,10 @@
     self.mapView.settings.compassButton    = YES;
     self.mapView.settings.myLocationButton = YES;
     [self.mapView setMinZoom:10 maxZoom:20];
-    
+
+    //set center location to self members
+    self.mapCenterLatitude = centerLatitude;
+    self.mapCenterLongitude= centerLongitude;
 }
 
 
@@ -111,11 +116,8 @@
 
     if(currentLocation != nil) {
         
-        self.mapCenterLatitude = currentLocation.coordinate.latitude;
-        self.mapCenterLongitude= currentLocation.coordinate.longitude;
-        
         //give current location to the map and show it
-        [self setMapWithLocation:self.mapCenterLatitude andLongitude:self.mapCenterLongitude withNewMapView:YES];
+        [self setMapWithLocation:currentLocation.coordinate.latitude andLongitude:currentLocation.coordinate.longitude withNewMapView:YES];
 
         //[self.view addSubview:self.mapView];
         [self.view insertSubview:self.mapView atIndex:0];
@@ -146,8 +148,7 @@
     } else {
         self.searchTableView.hidden = NO;
         
-        [self queryDataWithDescriptions:searchText toDataArray:self.searchedPlaceInfo];
-        
+        [self queryDataWithDescriptions:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:50000 toDataArray:self.searchedPlaceInfo];
     }
     
     [self.searchTableView reloadData];
@@ -205,11 +206,16 @@
     
 }
 
--(void) queryDataWithDescriptions: (NSString *) queryText toDataArray: (NSMutableArray *) dataArray
+-(void) queryDataWithDescriptions: (NSString *) queryText withLat:(CLLocationDegrees)latitude andLog:(CLLocationDegrees)longitude withRadius:(int)radius toDataArray: (NSMutableArray *) dataArray
 {
     NSString *codedQueryText = [queryText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *radiusString = [NSString stringWithFormat:@"%d", (int)radius];
+    NSString *locationString = [NSString stringWithFormat:@"%f,%f", (double)latitude, (double)longitude];
     
-    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=%@&sensor=true&input=%@", kGOOGLE_BROWSER_API_KEY, codedQueryText ];
+//    NSLog(@"%@, [%@]", radiusString, locationString);
+    
+    
+    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=%@&sensor=true&input=%@&location=%@&radius=%@", kGOOGLE_BROWSER_API_KEY, codedQueryText, locationString, radiusString];
     
     //Formulate the string as a URL object.
     NSURL *urlObj=[NSURL URLWithString:url];
