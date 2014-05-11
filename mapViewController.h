@@ -9,22 +9,31 @@
 #import <UIKit/UIKit.h>
 #import <GoogleMaps/GoogleMaps.h>
 
+#define kGOOGLE_BROWSER_API_KEY @"AIzaSyDNAcReYgdx33lDHhGiydKUUTSC6e8AXOU"
+//#define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+
 @interface mapViewController : UIViewController <CLLocationManagerDelegate, UITableViewDelegate, UITableViewDataSource>
 
+#pragma mark - view
 @property (nonatomic, strong) GMSMapView *mapView;
-@property (nonatomic, strong) CLLocationManager *locationManager;
-
 @property (strong, nonatomic) IBOutlet UITableView *searchTableView;
 @property (strong, nonatomic) IBOutlet UISearchBar *searchBarTextField;
+@property (nonatomic, strong) CLLocationManager *locationManager;
+
+
+#pragma mark - map related
+@property (assign) CLLocationDegrees mapCenterLatitude;
+@property (assign) CLLocationDegrees mapCenterLongitude;
+
+- (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude;
 
 
 
-//variables
-@property (nonatomic, strong) NSArray *retrivedItems;
-@property (nonatomic, strong) NSMutableArray *filteredItems;
+#pragma mark - search related
+@property (nonatomic, strong) NSMutableArray *searchedPlaceInfo;
+//@property (nonatomic, strong) NSMutableArray *filteredNames;
+//@property (nonatomic, strong) NSMutableArray *filteredReferences;
+-(void) getSearchItems: (NSString *) queryText;
 
-//methods
-
-- (void) setMapWithLocation : (CLLocation *)location;
 
 @end

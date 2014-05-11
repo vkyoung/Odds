@@ -7,12 +7,16 @@
 //
 
 #import "mapViewController.h"
+#import "SUPlaceInfo.h"
 
 @interface mapViewController ()
 
 @end
 
 @implementation mapViewController
+
+//@synthesize mapCenterLatitude;
+//@synthesize mapCenterLongitude;
 
 #pragma mark - View
 
@@ -30,11 +34,8 @@
     
     //search table initilization
     self.searchTableView.hidden = YES;
-    
-    //initial variables
-    self.retrivedItems = [[NSArray alloc] initWithObjects:@"one", @"two", @"three", @"four", @"five", @"six", @"seven", @"eight", @"nine", @"ten", @"eleven", @"twelve", @"thirteen", @"forteen", nil];
-    self.filteredItems = [[NSMutableArray alloc] initWithArray:self.retrivedItems];
-    
+    self.searchedPlaceInfo = [NSMutableArray array];
+
     //hide navigation bar
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     
@@ -72,11 +73,11 @@
 }
 
 
-#pragma mark - setting map
+#pragma mark - map related
 
-- (void) setMapWithLocation:(CLLocation *)location
+- (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude;
 {
-    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude: location.coordinate.latitude  longitude:location.coordinate.longitude zoom:16 bearing:0 viewingAngle:0];
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:centerLatitude longitude:centerLongitude zoom:15 bearing:0 viewingAngle:0];
     self.mapView = [GMSMapView mapWithFrame:self.view.bounds camera:camera];
     self.mapView.mapType                   = kGMSTypeNormal;
     self.mapView.myLocationEnabled         = YES;
@@ -85,6 +86,7 @@
     [self.mapView setMinZoom:10 maxZoom:20];
     
 }
+
 
 
 
@@ -102,13 +104,19 @@
     CLLocation *currentLocation = [locations lastObject];
 
     if(currentLocation != nil) {
+        
+        self.mapCenterLatitude = currentLocation.coordinate.latitude;
+        self.mapCenterLongitude= currentLocation.coordinate.longitude;
+        
         //give current location to the map and show it
-        [self setMapWithLocation:currentLocation];
+        [self setMapWithLocation:self.mapCenterLatitude andLongitude:self.mapCenterLongitude];
+
         //[self.view addSubview:self.mapView];
         [self.view insertSubview:self.mapView atIndex:0];
         
         //stop update location
         [self.locationManager stopUpdatingLocation];
+        
         
     }
     
@@ -127,22 +135,24 @@
 */
 
 
-#pragma mark - search bar and table view
+#pragma mark - search related
+
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    
+    self.searchTableView.hidden = YES;
+}
 
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
+    [self.searchedPlaceInfo removeAllObjects];
+
     if([searchText length] == 0) {
         self.searchTableView.hidden = YES;
-        [self.filteredItems removeAllObjects];
     } else {
         self.searchTableView.hidden = NO;
-        [self.filteredItems removeAllObjects];
-        for(NSString *oneString in self.retrivedItems) {
-            NSRange r = [oneString rangeOfString:searchText options:NSCaseInsensitiveSearch];
-            if(r.location != NSNotFound) {
-                [self.filteredItems addObject:oneString];
-            }
-        }
+        
+        [self getSearchItems:searchText];
+        
     }
     
     [self.searchTableView reloadData];
@@ -155,7 +165,7 @@
 
 -(NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.filteredItems count];
+    return [self.searchedPlaceInfo count];
 }
 
 -(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -168,9 +178,72 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
     
-    cell.textLabel.text = self.filteredItems[indexPath.row];
+    SUPlaceInfo *selectedItem = self.searchedPlaceInfo[indexPath.row];
+    cell.textLabel.text = selectedItem.description;
     return cell;
 }
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    SUPlaceInfo *placeInfo = self.searchedPlaceInfo[indexPath.row];
+    
+    if(placeInfo.reference == nil) {
+        //finish the text
+        
+    }else {
+        //directly go to page
+    }
+    
+    /*
+    self.searchTableView.hidden = YES;
+
+    NSString *referenceString = self.filteredReferences[indexPath.row];
+    NSLog(@"%@", referenceString);
+
+    
+    
+    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/details/json?reference=%@&sensor=true&key=%@", referenceString, kGOOGLE_BROWSER_API_KEY];
+    NSURL *urlObj=[NSURL URLWithString:url];
+    NSData *urlData = [NSData dataWithContentsOfURL:urlObj];
+    NSError *error;
+    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:urlData options:kNilOptions error:&error];
+
+    NSDictionary *placeInfo = jsonData[@"result"];
+    NSLog(@"%@", placeInfo);
+*/
+}
+
+-(void) getSearchItems: (NSString *) queryText
+{
+    NSString *codedQueryText = [queryText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/queryautocomplete/json?key=%@&sensor=true&input=%@", kGOOGLE_BROWSER_API_KEY, codedQueryText ];
+    
+    //Formulate the string as a URL object.
+    NSURL *urlObj=[NSURL URLWithString:url];
+    NSData *urlData = [NSData dataWithContentsOfURL:urlObj];
+    NSError *error;
+    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:urlData options:kNilOptions error:&error];
+
+    
+    NSDictionary *dataSet = jsonData[@"predictions"];
+    
+    for(NSDictionary *oneData in dataSet) {
+       
+        SUPlaceInfo *placeInfo = [SUPlaceInfo placeInfoWithDescription:oneData[@"description"]];
+        
+        if(oneData[@"reference"] != nil) {
+            placeInfo.reference = oneData[@"reference"];
+        }
+        
+        [self.searchedPlaceInfo addObject:placeInfo];
+    }
+}
+
+
+
+
+
 
 
 @end
