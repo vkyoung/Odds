@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <GoogleMaps/GoogleMaps.h>
+#import "SUPlaceInfo.h"
 
 #define kGOOGLE_BROWSER_API_KEY @"AIzaSyDNAcReYgdx33lDHhGiydKUUTSC6e8AXOU"
-//#define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+
 
 @interface mapViewController : UIViewController <CLLocationManagerDelegate, UITableViewDelegate, UITableViewDataSource>
 
@@ -22,18 +23,16 @@
 
 
 #pragma mark - map related
-@property (assign) CLLocationDegrees mapCenterLatitude;
-@property (assign) CLLocationDegrees mapCenterLongitude;
+@property (nonatomic) CLLocationDegrees mapCenterLatitude;
+@property (nonatomic) CLLocationDegrees mapCenterLongitude;
 
-- (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude;
+- (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude withNewMapView: (bool) isNewView;
 
 
 
 #pragma mark - search related
 @property (nonatomic, strong) NSMutableArray *searchedPlaceInfo;
-//@property (nonatomic, strong) NSMutableArray *filteredNames;
-//@property (nonatomic, strong) NSMutableArray *filteredReferences;
--(void) getSearchItems: (NSString *) queryText;
-
+-(void) queryDataWithDescriptions: (NSString *) queryText toDataArray: (NSMutableArray *) dataArray;
+-(void) parseDetailedPlaceInfoTo: (SUPlaceInfo *) placeInfo withReference: (NSString *)reference;
 
 @end

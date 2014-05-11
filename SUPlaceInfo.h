@@ -7,12 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreLocation/CoreLocation.h>
+
+
 
 @interface SUPlaceInfo : NSObject
 
 
 @property (nonatomic, strong) NSString *description;
 @property (nonatomic, strong) NSString *reference;
+
+@property (nonatomic) CLLocationDegrees latitude;
+@property (nonatomic) CLLocationDegrees longitude;
 
 
 - (id) initWithDescription:(NSString *)description;

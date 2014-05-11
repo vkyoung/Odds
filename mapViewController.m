@@ -7,7 +7,6 @@
 //
 
 #import "mapViewController.h"
-#import "SUPlaceInfo.h"
 
 @interface mapViewController ()
 
@@ -15,8 +14,6 @@
 
 @implementation mapViewController
 
-//@synthesize mapCenterLatitude;
-//@synthesize mapCenterLongitude;
 
 #pragma mark - View
 
@@ -75,10 +72,19 @@
 
 #pragma mark - map related
 
-- (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude;
+
+- (void) setMapWithLocation : (CLLocationDegrees) centerLatitude andLongitude: (CLLocationDegrees) centerLongitude withNewMapView: (bool) isNewView
 {
-    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:centerLatitude longitude:centerLongitude zoom:15 bearing:0 viewingAngle:0];
-    self.mapView = [GMSMapView mapWithFrame:self.view.bounds camera:camera];
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:centerLatitude longitude:centerLongitude zoom:17 bearing:0 viewingAngle:60];
+    
+    if (isNewView == YES) {
+        self.mapView = [GMSMapView mapWithFrame:self.view.bounds camera:camera];
+        
+    }
+    else {
+        [self.mapView animateToCameraPosition:camera];
+    }
+    
     self.mapView.mapType                   = kGMSTypeNormal;
     self.mapView.myLocationEnabled         = YES;
     self.mapView.settings.compassButton    = YES;
@@ -109,7 +115,7 @@
         self.mapCenterLongitude= currentLocation.coordinate.longitude;
         
         //give current location to the map and show it
-        [self setMapWithLocation:self.mapCenterLatitude andLongitude:self.mapCenterLongitude];
+        [self setMapWithLocation:self.mapCenterLatitude andLongitude:self.mapCenterLongitude withNewMapView:YES];
 
         //[self.view addSubview:self.mapView];
         [self.view insertSubview:self.mapView atIndex:0];
@@ -122,17 +128,6 @@
     
 }
 
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 
 #pragma mark - search related
@@ -151,7 +146,7 @@
     } else {
         self.searchTableView.hidden = NO;
         
-        [self getSearchItems:searchText];
+        [self queryDataWithDescriptions:searchText toDataArray:self.searchedPlaceInfo];
         
     }
     
@@ -185,35 +180,32 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
     SUPlaceInfo *placeInfo = self.searchedPlaceInfo[indexPath.row];
     
     if(placeInfo.reference == nil) {
-        //finish the text
+        NSLog(@"Null reference, need to further processed");
+        //VKTBD
         
     }else {
-        //directly go to page
+        NSString *reference = placeInfo.reference;
+        [self parseDetailedPlaceInfoTo:placeInfo withReference:reference];
+//        NSLog(@"%.2f %.2f", placeInfo.latitude, placeInfo.longitude);
+
+        
+        //hide search table view hidden
+        [self.searchDisplayController setActive:NO];
+        self.searchTableView.hidden = YES;
+        
+        //relocate the map view position
+        [self setMapWithLocation:placeInfo.latitude andLongitude:placeInfo.longitude withNewMapView:NO];
+        
+        
     }
     
-    /*
-    self.searchTableView.hidden = YES;
-
-    NSString *referenceString = self.filteredReferences[indexPath.row];
-    NSLog(@"%@", referenceString);
-
-    
-    
-    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/details/json?reference=%@&sensor=true&key=%@", referenceString, kGOOGLE_BROWSER_API_KEY];
-    NSURL *urlObj=[NSURL URLWithString:url];
-    NSData *urlData = [NSData dataWithContentsOfURL:urlObj];
-    NSError *error;
-    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:urlData options:kNilOptions error:&error];
-
-    NSDictionary *placeInfo = jsonData[@"result"];
-    NSLog(@"%@", placeInfo);
-*/
 }
 
--(void) getSearchItems: (NSString *) queryText
+-(void) queryDataWithDescriptions: (NSString *) queryText toDataArray: (NSMutableArray *) dataArray
 {
     NSString *codedQueryText = [queryText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     
@@ -236,12 +228,27 @@
             placeInfo.reference = oneData[@"reference"];
         }
         
-        [self.searchedPlaceInfo addObject:placeInfo];
+        [dataArray addObject:placeInfo];
     }
 }
 
 
+-(void) parseDetailedPlaceInfoTo: (SUPlaceInfo *) placeInfo withReference: (NSString *)reference
+{    
+    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/details/json?reference=%@&sensor=true&key=%@", reference, kGOOGLE_BROWSER_API_KEY];
+    NSURL *urlObj=[NSURL URLWithString:url];
+    NSData *urlData = [NSData dataWithContentsOfURL:urlObj];
+    NSError *error;
+    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:urlData options:kNilOptions error:&error];
 
+    
+    
+    NSDictionary *allField = jsonData[@"result"];
+    NSDictionary *geometryField = allField[@"geometry"];
+    NSDictionary *locationField = geometryField[@"location"];
+    placeInfo.latitude = [locationField[@"lat"] floatValue];
+    placeInfo.longitude = [locationField[@"lng"] floatValue];
+}
 
 
 

@@ -5,7 +5,7 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>232F867C-7458-4058-85DD-5AABC1EAF549</string>
+	<string>AE4C3E0F-86B4-4FE2-B1A9-3359764C8397</string>
 	<key>IDESourceControlProjectName</key>
 	<string>odds</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
@@ -13,12 +13,10 @@
 		<key>ABBF409F-9930-4D95-B6DC-995B255C972D</key>
 		<string>https://github.com/vkyoung/Odds.git</string>
 	</dict>
-	<key>IDESourceControlProjectPath</key>
-	<string>odds.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>ABBF409F-9930-4D95-B6DC-995B255C972D</key>
-		<string>../..</string>
+		<string>../../../odds_v12</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/vkyoung/Odds.git</string>

@@ -8,6 +8,7 @@
 
 #import "SUPlaceInfo.h"
 
+
 @implementation SUPlaceInfo
 
 
@@ -29,6 +30,7 @@
 {
     return [[self alloc] initWithDescription:description];
 }
+
 
 
 @end
