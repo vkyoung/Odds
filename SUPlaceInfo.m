@@ -19,6 +19,7 @@
     if( self ) {
         self.description = description;
         self.reference = nil;
+        self.formattedAddress = nil;
     }
     
     return self;

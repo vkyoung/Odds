@@ -32,7 +32,9 @@
 
 #pragma mark - search related
 @property (nonatomic, strong) NSMutableArray *searchedPlaceInfo;
--(void) queryDataWithDescriptions: (NSString *) queryText withLat:(CLLocationDegrees)latitude andLog:(CLLocationDegrees)longitude withRadius:(int)radius toDataArray: (NSMutableArray *) dataArray;
+-(void) queryAutoCompleteText: (NSString *) queryText withLat:(CLLocationDegrees)latitude andLog:(CLLocationDegrees)longitude withRadius:(int)radius toDataArray: (NSMutableArray *) dataArray;
 -(void) parseDetailedPlaceInfoTo: (SUPlaceInfo *) placeInfo withReference: (NSString *)reference;
+-(void) parseDetailedPlaceInfoTo:(SUPlaceInfo *)placeInfo withPlaceDictionary: (NSDictionary *)placeFields;
+
 
 @end

@@ -148,7 +148,7 @@
     } else {
         self.searchTableView.hidden = NO;
         
-        [self queryDataWithDescriptions:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:50000 toDataArray:self.searchedPlaceInfo];
+        [self queryAutoCompleteText:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:50000 toDataArray:self.searchedPlaceInfo];
     }
     
     [self.searchTableView reloadData];
@@ -185,8 +185,15 @@
     SUPlaceInfo *placeInfo = self.searchedPlaceInfo[indexPath.row];
     
     if(placeInfo.reference == nil) {
-        NSLog(@"Null reference, need to further processed");
-        //VKTBD
+//        NSLog(@"Null reference, need to further processed");
+
+        NSString *searchText = placeInfo.description;
+        
+        [self.searchedPlaceInfo removeAllObjects];
+        
+        [self queryDataWithText:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:5000 toDataArray:self.searchedPlaceInfo];
+        
+        [tableView reloadData];
         
     }else {
         NSString *reference = placeInfo.reference;
@@ -206,7 +213,40 @@
     
 }
 
--(void) queryDataWithDescriptions: (NSString *) queryText withLat:(CLLocationDegrees)latitude andLog:(CLLocationDegrees)longitude withRadius:(int)radius toDataArray: (NSMutableArray *) dataArray
+-(void) queryDataWithText: (NSString *) queryText withLat:(CLLocationDegrees)latitude andLog:(CLLocationDegrees)longitude withRadius:(int)radius toDataArray: (NSMutableArray *) dataArray
+{
+    NSString *codedQueryText = [queryText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *radiusString = [NSString stringWithFormat:@"%d", (int)radius];
+    NSString *locationString = [NSString stringWithFormat:@"%f,%f", (double)latitude, (double)longitude];
+
+    NSString* url = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/textsearch/json?key=%@&sensor=true&query=%@&location=%@&radius=%@", kGOOGLE_BROWSER_API_KEY, codedQueryText, locationString, radiusString];
+    
+//    NSLog(@"%@", url);
+    
+    NSURL *urlObj=[NSURL URLWithString:url];
+    NSData *urlData = [NSData dataWithContentsOfURL:urlObj];
+    NSError *error;
+    NSDictionary *jsonData = [NSJSONSerialization JSONObjectWithData:urlData options:kNilOptions error:&error];
+    
+    NSDictionary *dataSet = jsonData[@"results"];
+
+//    NSLog(@"%@", dataSet);
+    
+    for(NSDictionary *oneData in dataSet) {
+        
+        SUPlaceInfo *placeInfo = [SUPlaceInfo placeInfoWithDescription:oneData[@"name"]];
+        
+        placeInfo.reference = oneData[@"reference"];
+        [self parseDetailedPlaceInfoTo:placeInfo withPlaceDictionary:oneData];
+
+        NSLog(@"%@, %@", placeInfo.description, placeInfo.formattedAddress);
+        
+        [dataArray addObject:placeInfo];
+    }
+    
+}
+
+-(void) queryAutoCompleteText: (NSString *) queryText withLat:(CLLocationDegrees)latitude andLog:(CLLocationDegrees)longitude withRadius:(int)radius toDataArray: (NSMutableArray *) dataArray
 {
     NSString *codedQueryText = [queryText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSString *radiusString = [NSString stringWithFormat:@"%d", (int)radius];
@@ -250,12 +290,23 @@
     
     
     NSDictionary *allField = jsonData[@"result"];
-    NSDictionary *geometryField = allField[@"geometry"];
+    
+    [self parseDetailedPlaceInfoTo:placeInfo withPlaceDictionary:allField];
+}
+
+
+-(void) parseDetailedPlaceInfoTo:(SUPlaceInfo *)placeInfo withPlaceDictionary: (NSDictionary *)placeFields
+{
+    //address
+    placeInfo.formattedAddress = placeFields[@"formatted_address"];
+
+    //latitude and longitude
+    NSDictionary *geometryField = placeFields[@"geometry"];
     NSDictionary *locationField = geometryField[@"location"];
     placeInfo.latitude = [locationField[@"lat"] floatValue];
     placeInfo.longitude = [locationField[@"lng"] floatValue];
+    
 }
-
 
 
 

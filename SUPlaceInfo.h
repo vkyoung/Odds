@@ -16,6 +16,7 @@
 
 @property (nonatomic, strong) NSString *description;
 @property (nonatomic, strong) NSString *reference;
+@property (nonatomic, strong) NSString *formattedAddress;
 
 @property (nonatomic) CLLocationDegrees latitude;
 @property (nonatomic) CLLocationDegrees longitude;
