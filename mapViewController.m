@@ -171,11 +171,19 @@
     UITableViewCell *cell = [self.searchTableView dequeueReusableCellWithIdentifier:cellIdentifier];
     
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        //cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
     
     SUPlaceInfo *selectedItem = self.searchedPlaceInfo[indexPath.row];
     cell.textLabel.text = selectedItem.description;
+    
+
+    
+    if(selectedItem.formattedAddress != nil) {
+        cell.detailTextLabel.text = selectedItem.formattedAddress;
+    }
+ 
     return cell;
 }
 
@@ -239,7 +247,7 @@
         placeInfo.reference = oneData[@"reference"];
         [self parseDetailedPlaceInfoTo:placeInfo withPlaceDictionary:oneData];
 
-        NSLog(@"%@, %@", placeInfo.description, placeInfo.formattedAddress);
+//        NSLog(@"%@, %@", placeInfo.description, placeInfo.formattedAddress);
         
         [dataArray addObject:placeInfo];
     }
@@ -272,6 +280,9 @@
         
         if(oneData[@"reference"] != nil) {
             placeInfo.reference = oneData[@"reference"];
+//            NSLog(@"%@", placeInfo.reference);
+            [self parseDetailedPlaceInfoTo:placeInfo withReference:placeInfo.reference];
+//            NSLog(@"%@", placeInfo.formattedAddress);
         }
         
         [dataArray addObject:placeInfo];
@@ -300,6 +311,7 @@
     //address
     placeInfo.formattedAddress = placeFields[@"formatted_address"];
 
+    
     //latitude and longitude
     NSDictionary *geometryField = placeFields[@"geometry"];
     NSDictionary *locationField = geometryField[@"location"];
