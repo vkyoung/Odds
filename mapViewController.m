@@ -134,6 +134,22 @@
 
 #pragma mark - search related
 
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    [searchBar resignFirstResponder];
+    [self.searchedPlaceInfo removeAllObjects];
+    
+    NSString *searchText = searchBar.text;
+    [self queryDataWithText:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:5000 toDataArray:self.searchedPlaceInfo];
+    
+
+//    NSLog(@"%d", (int)[self.searchedPlaceInfo count]);
+
+    [self.searchDisplayController setActive:NO];
+    [self.searchTableView reloadData];
+    
+}
+
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
     
     self.searchTableView.hidden = YES;
@@ -148,7 +164,7 @@
     } else {
         self.searchTableView.hidden = NO;
         
-        [self queryAutoCompleteText:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:50000 toDataArray:self.searchedPlaceInfo];
+        [self queryAutoCompleteText:searchText withLat:self.mapCenterLatitude andLog:self.mapCenterLongitude withRadius:500000 toDataArray:self.searchedPlaceInfo];
     }
     
     [self.searchTableView reloadData];
